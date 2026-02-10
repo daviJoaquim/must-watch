@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <form class="mt-4" method="POST">
+        <h2 class="mb-3">{{ 'Editar Item' if tarefa_selecionada else 'Adicionar à Lista' }}</h2>
+        
+        <div class="mb-3">
+            <label for="titulo-lista" class="form-label">Nome do filme/série/jogo/livro</label>
+            <input type="text" class="form-control" name="titulo-lista" id="titulo-lista" 
+                   value="{{ tarefa_selecionada.titulo_lista if tarefa_selecionada else '' }}" required>
+            <div id="ajudaNomeLista" class="form-text">Informe o nome do seu entretenimento.</div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label d-block">Categoria</label>
+            
+            {% set categorias_opcoes = ['Filme', 'Série', 'Jogo', 'Livro'] %}
+            {% for cat in categorias_opcoes %}
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="categorias" 
+                       id="cat-{{ cat }}" value="{{ cat }}"
+                       {% if tarefa_selecionada and cat in tarefa_selecionada.categorias %} checked {% endif %}>
+                <label class="form-check-label" for="cat-{{ cat }}">{{ cat }}</label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Salvar</button>
+
+        {% if tarefa_selecionada %}
+            <a href="{{ url_for('lista') }}" class="btn btn-secondary">Cancelar</a>
+        {% endif %}
+    </form>
+
+    <hr class="my-5">
+
+    <h2 class="my-3">Minha Lista de Desejos</h2>
+
+    {% if listas %}
+        <div class="list-group">
+            {% for item in listas %}
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ item.titulo_lista }}</strong> 
+                    <span class="badge bg-info text-dark ms-2">{{ item.categorias }}</span>
+                </div>
+                <div>
+                    <a href="{{ url_for('update', idLista=item.id_lista) }}" class="btn btn-sm btn-outline-primary">✏️ Editar</a>
+                    <a href="{{ url_for('delete', idLista=item.id_lista) }}" class="btn btn-sm btn-outline-danger">🗑️ Apagar</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-light">Nenhum entretenimento adicionado ainda.</div>
+    {% endif %}
+
+{% endblock %}

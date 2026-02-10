@@ -1,0 +1,63 @@
+from sqlite3 import Connection, connect, Cursor
+from types import TracebackType
+from typing import Any, Optional, Self, Type
+import traceback
+import os
+
+
+DB_PATH = os.getenv('DATABASE', './data/listas.sqlite3')
+
+def init_db(db_name: str = DB_PATH) -> None:
+    with connect(db_name) as conn:
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS listas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            titulo_lista TEXT NOT NULL,
+            categorias TEXT
+        );
+        """)
+
+class Database: 
+    """
+        Classe que gerencia conexões e oprerações com um banco de dados SQLite. Utiliza o protocolo de gerenciamento de contexto para garantit que a conexão seja encerrada corretamente.
+    """
+    def __init__(self, db_name: str = DB_PATH) -> None :
+        self.connection: Connection = connect(db_name)
+        self.cursor: Cursor = self.connection.cursor()
+        self.executar('''
+            CREATE TABLE IF NOT EXISTS listas (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                titulo_listas TEXT NOT NULL,
+                categorias TEXT
+            );
+            ''')
+
+    def executar(self, query: str, params: tuple = ()) -> Cursor:
+        self.cursor.execute(query, params)
+        self.connection.commit()
+        return self.cursor
+    
+    def buscar_tudo(self, query: str, params: tuple = ()) -> list[Any]:
+        self.cursor.execute(query, params)
+        return self.cursor.fetchall()
+    
+    def close(self) -> None:
+        self.connection.close()
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(
+            self, 
+            exc_type: Optional[Type[BaseException]], 
+            exc_value: Optional[BaseException], 
+            tb: Optional[TracebackType]) -> None:
+
+        if exc_type is not None:
+            print('Execeção capturada no contexto:')
+            print(f'Tipo: {exc_type.__name__}')
+            print(f'Mensagem: {exc_value}')
+            print('Traceback completo:')
+            traceback.print_tb(tb)
+
+        self.close()
