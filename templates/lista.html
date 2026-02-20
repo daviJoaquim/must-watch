@@ -3,32 +3,31 @@
 
 <div class="container mt-5">
 
-    <!-- Formulário -->
     <div class="card shadow-sm mb-5">
         <div class="card-body">
             <form method="POST">
                 <div class="mb-3">
-                    <input type="text" name="titulo-lista" class="form-control form-control-lg" 
+                    <input type="text" name="titulo_lista" class="form-control form-control-lg" 
                            placeholder="Título da Lista" required 
                            value="{{ lista_selecionada.titulo_lista if lista_selecionada else '' }}">
                 </div>
 
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <select name="tipo_de_categoria" class="form-select form-select-lg" required>
+                        <select name="categoria" class="form-select form-select-lg" required>
                             <option value="" disabled {% if not lista_selecionada %}selected{% endif %}>
-                                Selecione o tipo...
+                                Selecione a categoria...
                             </option>
-                            <option value="Jogo">Jogo</option>
-                            <option value="Filme">Filme</option>
-                            <option value="Série">Série</option>
-                            <option value="Livro">Livro</option>
+                            <option value="Jogo" {% if lista_selecionada and lista_selecionada.categoria == 'Jogo' %}selected{% endif %}>Jogo</option>
+                            <option value="Filme" {% if lista_selecionada and lista_selecionada.categoria == 'Filme' %}selected{% endif %}>Filme</option>
+                            <option value="Série" {% if lista_selecionada and lista_selecionada.categoria == 'Série' %}selected{% endif %}>Série</option>
+                            <option value="Livro" {% if lista_selecionada and lista_selecionada.categoria == 'Livro' %}selected{% endif %}>Livro</option>
                         </select>
                     </div>
 
                     <div class="col-md-6">
                         <input type="text" name="indicado" class="form-control form-control-lg" 
-                               placeholder="Indicado (opcional)" 
+                               placeholder="Indicado por (opcional)" 
                                value="{{ lista_selecionada.indicado if lista_selecionada else '' }}">
                     </div>
                 </div>
@@ -44,22 +43,21 @@
         </div>
     </div>
 
-    <!-- Lista de atividades -->
     <h2 class="mb-4">Minha Lista de Desejos</h2>
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {% for lista in listas %}
+        {% for lista in atividades %}
         <div class="col">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">{{ lista.titulo_lista }}</h5>
                     <p class="card-text">
-                        <span class="badge bg-secondary">{{ lista.tipo_de_categoria }}</span>
+                        <span class="badge bg-secondary">{{ lista.categoria }}</span>
                     </p>
                     
                     {% if lista.indicado %}
                         <small class="text-muted">
-                            Indicado: <strong>{{ lista.indicado }}</strong>
+                            Indicado por: <strong>{{ lista.indicado }}</strong>
                         </small>
                     {% endif %}
                 </div>
@@ -74,7 +72,7 @@
         {% else %}
             <div class="col-12">
                 <div class="alert alert-info text-center py-5">
-                    Nenhuma atividade foi colocada ainda
+                    Nenhum item cadastrado na lista ainda.
                 </div>
             </div>
         {% endfor %}

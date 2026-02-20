@@ -4,52 +4,56 @@ from models.database import Database
 
 class Lista:
     """
-        Classe Para representar atividade, com metodos para salvar, obter, excluir e  atualizar tarefas com um banco de dados usando a classe Database.
+        Classe para representar uma lista, com métodos para salvar, obter, 
+        excluir e atualizar registros com um banco de dados usando a classe Database.
     """
-    def __init__(self: Self, titulo_lista: Optional[str], tipo_de_categoria: Optional[str] = None ,indicado:Optional[str] = None, id_lista:Optional[int] = None)-> None:
+    def __init__(
+        self: Self, 
+        titulo_lista: Optional[str], 
+        categoria: Optional[str] = None, 
+        indicado: Optional[str] = None, 
+        id_lista: Optional[int] = None
+    ) -> None:
         self.titulo_lista: Optional[str] = titulo_lista
-        self.tipo_de_categoria: Optional[str]  = tipo_de_categoria
+        self.categoria: Optional[str] = categoria
         self.indicado: Optional[str] = indicado
         self.id_lista: Optional[int] = id_lista
-        
 
     @classmethod
     def id(cls, id: int) -> Self:
         with Database() as db:
-            query: str = 'SELECT titulo_lista, tipo_de_categoria, indicado FROM lista WHERE id = ?;'
+            query: str = 'SELECT titulo_lista, categoria, indicado FROM listas WHERE id = ?;'
             params: tuple = (id,)
             resultado = db.buscar_tudo(query, params)
-            print(resultado)
+            
+            [[titulo, cat, ind]] = resultado
 
-            [[titulo, tipo, indicado]] = resultado
+        return cls(id_lista=id, titulo_lista=titulo, categoria=cat, indicado=ind)
 
-        return cls(id_lista=id, titulo_lista=titulo, tipo_de_atividade=tipo, indicado=indicado)
-        
-    def salvar_lista(self: Self)-> None:
+    def salvar_lista(self: Self) -> None:
         with Database() as db:
-            query: str = " INSERT INTO atividades (titulo_lista, tipo_de_categoria, indicado) VALUES (?, ?, ?);"
-            params: tuple = (self.titulo_lista, self.tipo_de_categoria, self.indicado)
+            query: str = "INSERT INTO listas (titulo_lista, categoria, indicado) VALUES (?, ?, ?);"
+            params: tuple = (self.titulo_lista, self.categoria, self.indicado)
             db.executar(query, params)
 
     @classmethod
     def obter_listas(cls) -> list[Self]:
         with Database() as db:
-            query = 'SELECT titulo_lista, categorias, id FROM listas;'
+            query: str = 'SELECT titulo_lista, categoria, indicado, id FROM listas;'
             resultados: list[Any] = db.buscar_tudo(query)
-            listas = [cls(titulo, categorias, id_lista=id) for titulo, categorias, id in resultados]
+            listas: list[Any] = [cls(titulo, cat, ind, id) for titulo, cat, ind, id in resultados]
             return listas
-    
+
     def excluir_lista(self) -> Cursor:
         with Database() as db:
-            query: str = 'DELETE FROM atividades WHERE id = ?;'
+            query: str = 'DELETE FROM listas WHERE id = ?;'
             params: tuple = (self.id_lista,)
             resultado: Cursor = db.executar(query, params)
             return resultado
-    
+
     def atualizar_lista(self) -> Cursor:
-           with Database() as db:
-            query: str = 'UPDATE atividades SET titulo_atividade = ?, tipo_de_atividade = ?, indicado_por = ? WHERE id = ?;'
-            params: tuple = (self.titulo_lista, self.tipo_de_categoria,self.indicado, self.id_lista)
+        with Database() as db:
+            query: str = 'UPDATE listas SET titulo_lista = ?, categoria = ?, indicado = ? WHERE id = ?;'
+            params: tuple = (self.titulo_lista, self.categoria, self.indicado, self.id_lista)
             resultado: Cursor = db.executar(query, params)
             return resultado
-    
