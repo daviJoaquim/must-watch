@@ -24,7 +24,7 @@ def lista():
         return redirect(url_for('lista'))
 
     listas = Lista.obter_listas()
-    return render_template('lista.html', titulo='Sua Lista de Desejos', atividades=listas)
+    return render_template('lista.html', titulo='Sua Lista de Desejos', listas=listas)
 
 @app.route('/delete/<int:idLista>')
 def delete(idLista):
@@ -44,7 +44,7 @@ def update(idLista):
 
     listas = Lista.obter_listas()
     lista_selecionada = Lista.id(idLista)
-    return render_template('lista.html', titulo=f'Editando o item ID: {idLista}', lista_selecionada=lista_selecionada, atividades=listas)
+    return render_template('lista.html', titulo=f'Editando o item ID: {idLista}', lista_selecionada=lista_selecionada, listas=listas)
 
 @app.route('/ola')
 def ola_mundo():
